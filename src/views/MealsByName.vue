@@ -6,7 +6,7 @@
   <div class="grid grid-cols-1 md:grid-cols-4 gap-3 p-8">
     <div v-for="meal of meals" :key="meal.idMeal" class="bg-white shadow rounded-xl">
 
-      <router-link to="/">
+      <router-link :to="{ name: 'mealDetails', params: { id: meal.idMeal } }">
         <img :src="meal.strMealThumb" :alt="meal.strMeal" class="rounded-t-2xl h-40 w-full object-cover">
       </router-link>
 
@@ -19,7 +19,7 @@
         </p>
 
         <div class="px-3 mt-4">
-          <a :href="meal.strYoutube" target="_blank" class="px-3 py-2 rounded border-2 hover:bg-red-500 hover:text-white border-red-600">YouTube</a>
+          <YoutubeButton :href="meal.strYoutube" />
         </div>
 
       </div>
@@ -29,10 +29,13 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axiosClient from '../axiosClient.js';
 import store from '../store';
+import { useRoute } from 'vue-router';
+import YoutubeButton from '../components/YoutubeButton.vue';
 
+const route = useRoute();
 const keyword = ref('');
 const meals = computed(() => store.state.searchedMeals);
 
@@ -40,4 +43,10 @@ function searchMeals() {
   store.dispatch('searchMeals', keyword.value);
 }
 
+onMounted(() => {
+  keyword.value = route.params.name;
+  if (keyword.value) {
+    searchMeals();
+  }
+})
 </script>
